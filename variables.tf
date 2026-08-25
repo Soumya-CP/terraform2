@@ -6,7 +6,7 @@ variable "subscription_id" {
 variable "location" {
   description = "Azure region for all resources."
   type        = string
-  default     = "Central India"
+  default     = "East Asia"
 }
 
 variable "admin_username" {
