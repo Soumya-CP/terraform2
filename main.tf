@@ -89,7 +89,7 @@ resource "azurerm_linux_virtual_machine" "nous" {
   name                = "nous-vm"
   resource_group_name = azurerm_resource_group.nous.name
   location            = azurerm_resource_group.nous.location
-  size                = "Standard_B1s"
+  size                = "Standard_B2ts_v2"
   admin_username      = var.admin_username
   tags                = local.common_tags
 
