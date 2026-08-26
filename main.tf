@@ -2,44 +2,44 @@ locals {
   common_tags = {
     environment = "development"
     managed_by  = "terraform"
-    project     = "nous"
+    project     = "infosolution"
   }
 }
 
-resource "azurerm_resource_group" "nous" {
-  name     = "nous"
+resource "azurerm_resource_group" "infosolution" {
+  name     = "infosolution"
   location = var.location
   tags     = local.common_tags
 }
 
-resource "azurerm_virtual_network" "nous" {
-  name                = "nous-vnet"
+resource "azurerm_virtual_network" "infosolution" {
+  name                = "infosolution-vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.nous.location
-  resource_group_name = azurerm_resource_group.nous.name
+  location            = azurerm_resource_group.infosolution.location
+  resource_group_name = azurerm_resource_group.infosolution.name
   tags                = local.common_tags
 }
 
-resource "azurerm_subnet" "nous" {
-  name                 = "nous-subnet"
-  resource_group_name  = azurerm_resource_group.nous.name
-  virtual_network_name = azurerm_virtual_network.nous.name
+resource "azurerm_subnet" "infosolution" {
+  name                 = "infosolution-subnet"
+  resource_group_name  = azurerm_resource_group.infosolution.name
+  virtual_network_name = azurerm_virtual_network.infosolution.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-resource "azurerm_public_ip" "nous" {
-  name                = "nous-public-ip"
-  location            = azurerm_resource_group.nous.location
-  resource_group_name = azurerm_resource_group.nous.name
+resource "azurerm_public_ip" "infosolution" {
+  name                = "infosolution-public-ip"
+  location            = azurerm_resource_group.infosolution.location
+  resource_group_name = azurerm_resource_group.infosolution.name
   allocation_method   = "Static"
   sku                 = "Standard"
   tags                = local.common_tags
 }
 
-resource "azurerm_network_security_group" "nous" {
-  name                = "nous-nsg"
-  location            = azurerm_resource_group.nous.location
-  resource_group_name = azurerm_resource_group.nous.name
+resource "azurerm_network_security_group" "infosolution" {
+  name                = "infosolution-nsg"
+  location            = azurerm_resource_group.infosolution.location
+  resource_group_name = azurerm_resource_group.infosolution.name
   tags                = local.common_tags
 
   security_rule {
@@ -55,51 +55,51 @@ resource "azurerm_network_security_group" "nous" {
   }
 }
 
-resource "azurerm_network_interface" "nous" {
-  name                = "nous-nic"
-  location            = azurerm_resource_group.nous.location
-  resource_group_name = azurerm_resource_group.nous.name
+resource "azurerm_network_interface" "infosolution" {
+  name                = "infosolution-nic"
+  location            = azurerm_resource_group.infosolution.location
+  resource_group_name = azurerm_resource_group.infosolution.name
   tags                = local.common_tags
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.nous.id
+    subnet_id                     = azurerm_subnet.infosolution.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.nous.id
+    public_ip_address_id          = azurerm_public_ip.infosolution.id
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "nous" {
-  network_interface_id      = azurerm_network_interface.nous.id
-  network_security_group_id = azurerm_network_security_group.nous.id
+resource "azurerm_network_interface_security_group_association" "infosolution" {
+  network_interface_id      = azurerm_network_interface.infosolution.id
+  network_security_group_id = azurerm_network_security_group.infosolution.id
 }
 
-resource "tls_private_key" "nous" {
+resource "tls_private_key" "infosolution" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "local_sensitive_file" "ssh_private_key" {
-  content         = tls_private_key.nous.private_key_openssh
-  filename        = "${path.module}/nous-vm.pem"
+  content         = tls_private_key.infosolution.private_key_openssh
+  filename        = "${path.module}/infosolution-vm.pem"
   file_permission = "0600"
 }
 
-resource "azurerm_linux_virtual_machine" "nous" {
-  name                = "nous-vm"
-  resource_group_name = azurerm_resource_group.nous.name
-  location            = azurerm_resource_group.nous.location
-  size                = "Standard_B2ts_v2"
+resource "azurerm_linux_virtual_machine" "infosolution" {
+  name                = "infosolution-vm"
+  resource_group_name = azurerm_resource_group.infosolution.name
+  location            = azurerm_resource_group.infosolution.location
+  size                = "Standard_B1s"
   admin_username      = var.admin_username
   tags                = local.common_tags
 
   network_interface_ids = [
-    azurerm_network_interface.nous.id
+    azurerm_network_interface.infosolution.id
   ]
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = tls_private_key.nous.public_key_openssh
+    public_key = tls_private_key.infosolution.public_key_openssh
   }
 
   os_disk {
