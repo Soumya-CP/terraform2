@@ -89,7 +89,7 @@ resource "azurerm_linux_virtual_machine" "artizens" {
   name                = "artizens-vm"
   resource_group_name = azurerm_resource_group.artizens.name
   location            = azurerm_resource_group.artizens.location
-  size                = "Standard_B1s"
+  size                = "Standard_B2ats_v2"
   admin_username      = var.admin_username
   tags                = local.common_tags
 
